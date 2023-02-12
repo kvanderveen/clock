@@ -8,19 +8,21 @@ function windowResized() {
 }
 
 function draw() {
-  const clock = new Clock()
+  const clock = new Clock(true)
   clock.drawClock()
 }
 
 class Clock {
-  constructor() {
-    this.currentDateTime = new Date()
-    this.hour = (this.currentDateTime.getHours() % 12) + this.currentDateTime.getMinutes() / 60
-    this.minute = this.currentDateTime.getMinutes() + this.currentDateTime.getSeconds() / 60
-    this.second = this.currentDateTime.getSeconds() + this.currentDateTime.getMilliseconds() / 1000
-    this.degreesHour = this.hour * 30 - 90
-    this.degreesMinute = this.minute * 6 - 90
-    this.degreesSecond = this.second * 6 - 90
+  constructor(roman = false) {
+    const currentDateTime = new Date()
+    const hour = currentDateTime.getHours()
+    const minute = currentDateTime.getMinutes()
+    const second = currentDateTime.getSeconds()
+    const milliseconds = currentDateTime.getMilliseconds()
+    this.roman = roman
+    this.degreesHour = (hour + minute / 60 + second / 3600) * 30 - 90
+    this.degreesMinute = (minute + (second + milliseconds / 1000) / 60) * 6 - 90
+    this.degreesSecond = (second + milliseconds / 1000) * 6 - 90
     this.relativeSize = min(windowWidth, windowHeight)
   }
 
@@ -43,11 +45,14 @@ class Clock {
     fill(color('black'))
     textSize(this.relativeSize * 0.05)
     textAlign(CENTER, CENTER)
-    'III IV V VI VII VIII IX X XI XII I II'.split(' ').forEach((n, index) => {
+    const numbers = this.roman
+      ? 'I II III IV V VI VII VIII IX X XI XII'.split(' ')
+      : '1 2 3 4 5 6 7 8 9 10 11 12'.split(' ')
+    numbers.forEach((n, index) => {
       text(
         n,
-        this.relativeSize * 0.26 * cos(index * 30),
-        this.relativeSize * 0.26 * sin(index * 30)
+        this.relativeSize * 0.26 * cos(index * 30 - 60),
+        this.relativeSize * 0.26 * sin(index * 30 - 60)
       )
     })
     pop()
